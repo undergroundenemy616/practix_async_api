@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    restart: always
+    ports:
+      - 9200:9200
+    volumes:
+      - elastic_data:/var/lib/elasticsearch/data
+    networks:
+      - movies_network
+
+  movies-redis:
+    image: redis:alpine
+    volumes:
+      - redis_data:/var/lib/redis/data
+    restart: always
+    networks:
+      - movies_network
+
+  movies-api:
+    build:
+      context: src/
+      dockerfile: Dockerfile
+    command: python3 /code/main.py
+    ports:
+      - 8002:8000
+    volumes:
+      - ./src:/code
+    env_file:
+      - ./.env
+    depends_on:
+      - elasticsearch
+      - movies-redis
+    restart: always
+    networks:
+      - movies_network
+
+volumes:
+  elastic_data:
+  redis_data:
+
+networks:
+  movies_network:
+    external: true
+    name: movies_network
