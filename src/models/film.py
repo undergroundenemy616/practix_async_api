@@ -26,16 +26,15 @@ class Film(BaseModel):
     type: str
     title: str
     description: str
-    genres_names: List[str] = []
-    directors_names: List[str] = []
-    actors_names: List[str] = []
-    writers_names: List[str] = []
+    genres_names: List[str] = None
+    directors_names: List[str] = None
+    actors_names: List[str] = None
+    writers_names: List[str] = None
     genres: List[FilmGenre] = []
     directors: List[FilmPerson] = []
     actors: List[FilmPerson] = []
     writers: List[FilmPerson] = []
 
     class Config:
-        # Заменяем стандартную работу с json на более быструю
         json_loads = orjson.loads
         json_dumps = orjson_dumps
