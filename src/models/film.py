@@ -12,7 +12,7 @@ def orjson_dumps(v, *, default):
 
 class FilmPerson(BaseModel):
     id: uuid.UUID
-    full_name: str
+    name: str
 
 
 class FilmGenre(BaseModel):
