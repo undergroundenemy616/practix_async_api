@@ -15,7 +15,7 @@ class Person(BaseModel):
     full_name: str
     roles: List[str] = []
     birth_date: date = None
-    film_ids: List[uuid] = []
+    film_ids: List[uuid.UUID] = []
 
     class Config:
         json_loads = orjson.loads
