@@ -6,8 +6,6 @@ services:
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
     restart: always
-    ports:
-      - 9200:9200
     volumes:
       - elastic_data:/var/lib/elasticsearch/data
     networks:
@@ -26,8 +24,6 @@ services:
       context: src/
       dockerfile: Dockerfile
     command: python3 /code/main.py
-    ports:
-      - 8002:8000
     volumes:
       - ./src:/code
     env_file:
@@ -35,6 +31,21 @@ services:
     depends_on:
       - elasticsearch
       - movies-redis
+    restart: always
+    networks:
+      - movies_network
+
+  nginx-async-api:
+    image: nginx:1.19.2
+    depends_on:
+      - movies-api
+      - movies-redis
+      - elasticsearch
+    ports:
+      - "80:80"
+    volumes:
+      - ./etc/nginx/configs:/etc/nginx/conf.d:ro
+      - ./etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     restart: always
     networks:
       - movies_network
