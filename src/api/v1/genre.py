@@ -32,5 +32,8 @@ async def genre_details(genre_id: str, genre_service: GenreService = Depends(get
 async def genres_list(
         amount: int = Query(100),
         genre_service: GenresListService = Depends(get_genre_list_service)) -> List[Genre]:
-    genres = await genre_service.get_genres(amount)
+    try:
+        genres = await genre_service.get_genres(amount)
+    except NotFoundError:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='genres not found')
     return [Genre(id=genre.id, name=genre.name) for genre in genres]
