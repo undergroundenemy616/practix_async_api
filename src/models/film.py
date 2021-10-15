@@ -21,7 +21,7 @@ class FilmGenre(BaseModel):
 
 
 class Film(BaseModel):
-    id: uuid.UUID
+    id: str
     rating: float
     type: str
     title: str
