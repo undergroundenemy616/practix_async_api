@@ -5,7 +5,8 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from models.film import FilmListResponseModel, FilmResponseModel
 from pydantic import ValidationError
-from services.film.film import FilmService, get_film_service
+
+from services.single_object_service import SingleObjectService, get_film_service
 from services.film.film_list import FilmsListService, get_list_film_service
 from services.film.film_search_list import (FilmSearchService,
                                             get_search_list_persons_service)
@@ -45,7 +46,7 @@ async def film_search(query: str = Query(...),
 
 
 @router.get('/{film_id}', response_model=FilmResponseModel)
-async def film_details(film_id: str, film_service: FilmService = Depends(get_film_service)) -> FilmResponseModel:
+async def film_details(film_id: str, film_service: SingleObjectService = Depends(get_film_service)) -> FilmResponseModel:
     film = await film_service.get_by_id(film_id)
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')

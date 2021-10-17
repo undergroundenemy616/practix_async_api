@@ -30,7 +30,7 @@ class PersonFilmsListService:
     async def _get_person_films_from_elastic(self, person_id: str) -> List[Film]:
         doc = await self.elastic.get('person', person_id)
         film_ids = doc['_source']['film_ids']
-        result = await self.elastic.search(index='film', body={'query': {'terms': {"_id": film_ids}}})
+        result = await self.elastic.search(index='filmwork', body={'query': {'terms': {"_id": film_ids}}})
         return [Film(**film['_source']) for film in result['hits']['hits']]
 
     async def _get_person_films_from_cache(self, person_id: str) -> List[Film]:

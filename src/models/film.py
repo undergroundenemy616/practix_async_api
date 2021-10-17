@@ -21,7 +21,7 @@ class Film(CustomBaseModel):
     rating: float
     type: str
     title: str
-    description: str
+    description: str = None
     genres_names: List[str] = None
     directors_names: List[str] = None
     actors_names: List[str] = None
@@ -36,11 +36,11 @@ class FilmResponseModel(BaseModel):
     id: str
     title: str
     rating: float
-    description: str
-    genre: List[FilmGenre]
-    actors: List[FilmPerson]
-    writers: List[FilmPerson]
-    directors: List[FilmPerson]
+    description: str = None
+    genre: List[FilmGenre] = []
+    actors: List[FilmPerson] = []
+    writers: List[FilmPerson] = []
+    directors: List[FilmPerson] = []
 
 
 class FilmListResponseModel(BaseModel):

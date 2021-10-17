@@ -6,14 +6,15 @@ from elasticsearch import NotFoundError
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from models.genre import GenreResponseModel
-from services.genre.genre_detailed import GenreService, get_genre_service
+
+from services.single_object_service import SingleObjectService, get_genre_service
 from services.genre.genre_list import GenresListService, get_genre_list_service
 
 router = APIRouter()
 
 
 @router.get('/{genre_id}', response_model=GenreResponseModel)
-async def genre_details(genre_id: str, genre_service: GenreService = Depends(get_genre_service)) -> GenreResponseModel:
+async def genre_details(genre_id: str, genre_service: SingleObjectService = Depends(get_genre_service)) -> GenreResponseModel:
     try:
         genre = await genre_service.get_by_id(genre_id)
     except NotFoundError:
