@@ -1,18 +1,17 @@
 import uuid
-import orjson
 
 from pydantic import BaseModel
 
-
-def orjson_dumps(v, *, default):
-    return orjson.dumps(v, default=default).decode()
+from utils import CustomBaseModel
 
 
-class Genre(BaseModel):
+class Genre(CustomBaseModel):
     id: uuid.UUID
     name: str
     description: str = None
 
-    class Config:
-        json_loads = orjson.loads
-        json_dumps = orjson_dumps
+
+class GenreResponseModel(BaseModel):
+    id: uuid.UUID
+    name: str
+    description: str = None

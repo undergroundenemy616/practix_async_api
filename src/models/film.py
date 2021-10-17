@@ -1,13 +1,9 @@
 import uuid
 from typing import List
 
-import orjson
-
 from pydantic import BaseModel
 
-
-def orjson_dumps(v, *, default):
-    return orjson.dumps(v, default=default).decode()
+from utils import CustomBaseModel
 
 
 class FilmPerson(BaseModel):
@@ -20,7 +16,7 @@ class FilmGenre(BaseModel):
     name: str
 
 
-class Film(BaseModel):
+class Film(CustomBaseModel):
     id: str
     rating: float
     type: str
@@ -35,6 +31,19 @@ class Film(BaseModel):
     actors: List[FilmPerson] = []
     writers: List[FilmPerson] = []
 
-    class Config:
-        json_loads = orjson.loads
-        json_dumps = orjson_dumps
+
+class FilmResponseModel(BaseModel):
+    id: str
+    title: str
+    rating: float
+    description: str
+    genre: List[FilmGenre]
+    actors: List[FilmPerson]
+    writers: List[FilmPerson]
+    directors: List[FilmPerson]
+
+
+class FilmListResponseModel(BaseModel):
+    id: uuid.UUID
+    title: str
+    rating: float

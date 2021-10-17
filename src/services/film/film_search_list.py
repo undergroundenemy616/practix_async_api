@@ -6,7 +6,7 @@ from db.redis import get_redis
 from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
 
-from services.film.BaseListFilmService import BaseListFilmService
+from services.film.base_list_film_service import BaseListFilmService
 
 
 class FilmSearchService(BaseListFilmService):

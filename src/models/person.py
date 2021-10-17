@@ -1,22 +1,35 @@
 import uuid
 from typing import List
 from datetime import date
-import orjson
 
 from pydantic import BaseModel
 
-
-def orjson_dumps(v, *, default):
-    return orjson.dumps(v, default=default).decode()
+from utils import CustomBaseModel
 
 
-class Person(BaseModel):
+class Person(CustomBaseModel):
     id: uuid.UUID
     full_name: str
     roles: List[str] = []
     birth_date: date = None
     film_ids: List[uuid.UUID] = []
 
-    class Config:
-        json_loads = orjson.loads
-        json_dumps = orjson_dumps
+
+class PersonResponseModel(BaseModel):
+    id: uuid.UUID
+    full_name: str
+    roles: List[str] = []
+    film_ids: List[uuid.UUID] = []
+
+
+class PersonListResponseModel(BaseModel):
+    total_pages: int
+    page: int
+    objects: List[PersonResponseModel] = []
+
+
+class PersonFilmResponseModel(BaseModel):
+    id: uuid.UUID
+    title: str
+    rating: float = None
+
