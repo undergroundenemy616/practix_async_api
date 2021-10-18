@@ -15,3 +15,6 @@ class GenreResponseModel(BaseModel):
     id: uuid.UUID
     name: str
     description: str = None
+
+    def __hash__(self):
+        return hash((type(self),) + tuple(self.__dict__.values()))

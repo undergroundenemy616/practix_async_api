@@ -1,18 +1,5 @@
-from functools import lru_cache
-from typing import Optional
-
 from aioredis import Redis
-from pydantic import BaseModel
-
-from db.elastic import get_elastic
-from db.redis import get_redis
 from elasticsearch import AsyncElasticsearch
-from fastapi import Depends
-
-from models.film import Film
-from models.genre import Genre
-from models.person import Person
-
 FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5  # 5 минут
 
 
@@ -45,33 +32,3 @@ class SingleObjectService:
 
     async def _put_object_to_cache(self, object_):
         await self.redis.set(str(object_.id), object_.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
-
-
-@lru_cache()
-def get_film_service(
-        index: str = 'filmwork',
-        model: BaseModel = Film,
-        redis: Redis = Depends(get_redis),
-        elastic: AsyncElasticsearch = Depends(get_elastic),
-) -> SingleObjectService:
-    return SingleObjectService(redis, elastic, index, model)
-
-
-@lru_cache()
-def get_genre_service(
-        index: str = 'genre',
-        model: BaseModel = Genre,
-        redis: Redis = Depends(get_redis),
-        elastic: AsyncElasticsearch = Depends(get_elastic),
-) -> SingleObjectService:
-    return SingleObjectService(redis, elastic, index, model)
-
-
-@lru_cache()
-def get_person_service(
-        index: str = 'person',
-        model: BaseModel = Person,
-        redis: Redis = Depends(get_redis),
-        elastic: AsyncElasticsearch = Depends(get_elastic),
-) -> SingleObjectService:
-    return SingleObjectService(redis, elastic, index, model)

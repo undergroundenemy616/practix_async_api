@@ -6,10 +6,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from models.film import FilmListResponseModel, FilmResponseModel
 from pydantic import ValidationError
 
-from services.single_object_service import SingleObjectService, get_film_service
-from services.film.film_list import FilmsListService, get_list_film_service
-from services.film.film_search_list import (FilmSearchService,
-                                            get_search_list_persons_service)
+from services.base_services.single_object_service import SingleObjectService
+from services.film import FilmsListService, \
+    get_list_film_service, FilmSearchService, get_search_list_persons_service, get_retrieve_film_service
+
 
 router = APIRouter()
 
@@ -23,7 +23,7 @@ async def film_list(sort: str = Query('-rating'),
                     genre: Optional[str] = None,
                     film_service: FilmsListService = Depends(get_list_film_service)):
     try:
-        films_response = await film_service.get_films(page_size, page_number, genre=genre, sort=sort)
+        films_response = await film_service.get_objects(page_size, page_number, genre=genre, sort=sort)
     except ValidationError:
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="No such page")
     return [FilmListResponseModel(id=film.id,
@@ -37,7 +37,7 @@ async def film_search(query: str = Query(...),
                       page_number: int = Query(1),
                       film_service: FilmSearchService = Depends(get_search_list_persons_service)):
     try:
-        films_response = await film_service.get_films(page_size, page_number, query=query)
+        films_response = await film_service.get_objects(page_size, page_number, query=query)
     except ValidationError:
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="No such page")
     return [FilmListResponseModel(id=film.id,
@@ -46,7 +46,7 @@ async def film_search(query: str = Query(...),
 
 
 @router.get('/{film_id}', response_model=FilmResponseModel)
-async def film_details(film_id: str, film_service: SingleObjectService = Depends(get_film_service)) -> FilmResponseModel:
+async def film_details(film_id: str, film_service: SingleObjectService = Depends(get_retrieve_film_service)) -> FilmResponseModel:
     film = await film_service.get_by_id(film_id)
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
