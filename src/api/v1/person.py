@@ -5,10 +5,12 @@ from elasticsearch import NotFoundError
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import ValidationError
 
-from models.person import PersonResponseModel, PersonFilmResponseModel
-
+from models.person import PersonFilmResponseModel, PersonResponseModel
 from services.base_services.single_object_service import SingleObjectService
-from services.person import PersonFilmsListService, get_person_films_service, PersonSearchListService, get_search_list_persons_service, get_retrieve_person_service
+from services.person import (PersonFilmsListService, PersonSearchListService,
+                             get_person_films_service,
+                             get_retrieve_person_service,
+                             get_search_list_persons_service)
 
 router = APIRouter()
 

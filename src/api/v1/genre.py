@@ -1,14 +1,14 @@
+import logging
 from http import HTTPStatus
 from typing import List
-import logging
 
 from elasticsearch import NotFoundError
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from models.genre import GenreResponseModel
-
 from services.base_services.single_object_service import SingleObjectService
-from services.genre import GenresListService, get_genre_list_service, get_genre_retrieve_service
+from services.genre import (GenresListService, get_genre_list_service,
+                            get_genre_retrieve_service)
 
 router = APIRouter()
 

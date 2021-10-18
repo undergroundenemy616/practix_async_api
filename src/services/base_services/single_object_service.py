@@ -1,6 +1,7 @@
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
-FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5  # 5 минут
+
+from utils import CACHE_EXPIRE_IN_SECONDS
 
 
 class SingleObjectService:
@@ -31,4 +32,4 @@ class SingleObjectService:
         return object_
 
     async def _put_object_to_cache(self, object_):
-        await self.redis.set(str(object_.id), object_.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
+        await self.redis.set(str(object_.id), object_.json(), expire=CACHE_EXPIRE_IN_SECONDS)

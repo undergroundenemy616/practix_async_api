@@ -5,7 +5,7 @@ from typing import List, Optional
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
 
-FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5
+from utils import CACHE_EXPIRE_IN_SECONDS
 
 
 class BaseListService:
@@ -61,4 +61,4 @@ class BaseListService:
                                          "page_size": page_size,
                                          "page_number": page_number}),
                              json.dumps([document.json() for document in objects]),
-                             expire=FILM_CACHE_EXPIRE_IN_SECONDS)
+                             expire=CACHE_EXPIRE_IN_SECONDS)

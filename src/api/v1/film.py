@@ -4,13 +4,13 @@ from typing import List, Optional
 
 from elasticsearch import NotFoundError
 from fastapi import APIRouter, Depends, HTTPException, Query
-from models.film import FilmListResponseModel, FilmResponseModel
 from pydantic import ValidationError
 
+from models.film import FilmListResponseModel, FilmResponseModel
 from services.base_services.single_object_service import SingleObjectService
-from services.film import FilmsListService, \
-    get_list_film_service, FilmSearchService, get_search_list_persons_service, get_retrieve_film_service
-
+from services.film import (FilmSearchService, FilmsListService,
+                           get_list_film_service, get_retrieve_film_service,
+                           get_search_list_persons_service)
 
 router = APIRouter()
 

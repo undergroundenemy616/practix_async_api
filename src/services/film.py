@@ -2,13 +2,14 @@ from functools import lru_cache
 from typing import Optional
 
 from aioredis import Redis
-from db.elastic import get_elastic
-from db.redis import get_redis
 from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
-from services.base_services.list_object_service import BaseListService
 from pydantic import BaseModel
+
+from db.elastic import get_elastic
+from db.redis import get_redis
 from models.film import Film
+from services.base_services.list_object_service import BaseListService
 from services.base_services.single_object_service import SingleObjectService
 
 

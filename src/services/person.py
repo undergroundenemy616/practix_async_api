@@ -1,18 +1,17 @@
+import logging
 from functools import lru_cache
 from typing import List
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
+from pydantic import BaseModel
 
 from db.elastic import get_elastic
 from db.redis import get_redis
 from models.film import Film
-from services.base_services.list_object_service import BaseListService
-from pydantic import BaseModel
 from models.person import Person
-import logging
-
+from services.base_services.list_object_service import BaseListService
 from services.base_services.single_object_service import SingleObjectService
 
 logging.basicConfig(level=logging.INFO)

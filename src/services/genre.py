@@ -1,14 +1,14 @@
+from functools import lru_cache
+
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
-from functools import lru_cache
+from pydantic import BaseModel
 
 from db.elastic import get_elastic
 from db.redis import get_redis
 from models.genre import Genre
 from services.base_services.list_object_service import BaseListService
-from pydantic import BaseModel
-
 from services.base_services.single_object_service import SingleObjectService
 
 FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5  # 5 минут
