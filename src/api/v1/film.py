@@ -2,6 +2,7 @@ import logging
 from http import HTTPStatus
 from typing import List, Optional
 
+from elasticsearch import NotFoundError
 from fastapi import APIRouter, Depends, HTTPException, Query
 from models.film import FilmListResponseModel, FilmResponseModel
 from pydantic import ValidationError
@@ -26,6 +27,8 @@ async def film_list(sort: str = Query('-rating'),
         films_response = await film_service.get_objects(page_size, page_number, genre=genre, sort=sort)
     except ValidationError:
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="No such page")
+    except NotFoundError:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
     return [FilmListResponseModel(id=film.id,
                                   title=film.title,
                                   rating=film.rating) for film in films_response]
@@ -40,6 +43,8 @@ async def film_search(query: str = Query(...),
         films_response = await film_service.get_objects(page_size, page_number, query=query)
     except ValidationError:
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="No such page")
+    except NotFoundError:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
     return [FilmListResponseModel(id=film.id,
                                   title=film.title,
                                   rating=film.rating) for film in films_response]
@@ -47,8 +52,9 @@ async def film_search(query: str = Query(...),
 
 @router.get('/{film_id}', response_model=FilmResponseModel)
 async def film_details(film_id: str, film_service: SingleObjectService = Depends(get_retrieve_film_service)) -> FilmResponseModel:
-    film = await film_service.get_by_id(film_id)
-    if not film:
+    try:
+        film = await film_service.get_by_id(film_id)
+    except NotFoundError:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
     return FilmResponseModel(id=film.id,
                              title=film.title,

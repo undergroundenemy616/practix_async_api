@@ -5,7 +5,7 @@ from elasticsearch import NotFoundError
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import ValidationError
 
-from models.person import PersonListResponseModel, PersonResponseModel, PersonFilmResponseModel
+from models.person import PersonResponseModel, PersonFilmResponseModel
 
 from services.base_services.single_object_service import SingleObjectService
 from services.person import PersonFilmsListService, get_person_films_service, PersonSearchListService, get_search_list_persons_service, get_retrieve_person_service
@@ -13,7 +13,7 @@ from services.person import PersonFilmsListService, get_person_films_service, Pe
 router = APIRouter()
 
 
-@router.get('/search', response_model=PersonListResponseModel)
+@router.get('/search', response_model=List[PersonResponseModel])
 async def person_list(query: str = Query(...),
                       page_size: int = Query(20),
                       page_number: int = Query(1),
@@ -45,5 +45,8 @@ async def person_films_list(person_id: str,
                             page_size: int = Query(20),
                             page_number: int = Query(1),
                             person_service: PersonFilmsListService = Depends(get_person_films_service)) -> List[PersonFilmResponseModel]:
-    films = await person_service.get_objects(page_size, page_number, person_id=person_id)
+    try:
+        films = await person_service.get_objects(page_size, page_number, person_id=person_id)
+    except NotFoundError:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='persons films not found')
     return [PersonFilmResponseModel(id=film.id, title=film.title, rating=film.rating) for film in films]

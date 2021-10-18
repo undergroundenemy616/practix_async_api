@@ -55,29 +55,23 @@ class FilmSearchService(BaseListService):
 
 @lru_cache()
 def get_list_film_service(
-        index: str = 'filmwork',
-        model: BaseModel = Film,
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> FilmsListService:
-    return FilmsListService(redis, elastic, index, model)
+    return FilmsListService(redis, elastic, index='filmwork', model=Film)
 
 
 @lru_cache()
 def get_search_list_persons_service(
-        index: str = 'filmwork',
-        model: BaseModel = Film,
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> FilmSearchService:
-    return FilmSearchService(redis, elastic, index, model)
+    return FilmSearchService(redis, elastic, index='filmwork', model=Film)
 
 
 @lru_cache()
 def get_retrieve_film_service(
-        index: str = 'filmwork',
-        model: BaseModel = Film,
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> SingleObjectService:
-    return SingleObjectService(redis, elastic, index, model)
+    return SingleObjectService(redis, elastic, index='filmwork', model=Film)

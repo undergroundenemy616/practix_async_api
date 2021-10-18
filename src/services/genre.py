@@ -28,19 +28,15 @@ class GenresListService(BaseListService):
 
 @lru_cache()
 def get_genre_list_service(
-        index: str = 'genre',
-        model: BaseModel = Genre,
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> GenresListService:
-    return GenresListService(redis, elastic, index, model)
+    return GenresListService(redis, elastic, index='genre', model=Genre)
 
 
 @lru_cache()
 def get_genre_retrieve_service(
-        index: str = 'genre',
-        model: BaseModel = Genre,
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> SingleObjectService:
-    return SingleObjectService(redis, elastic, index, model)
+    return SingleObjectService(redis, elastic, index='genre', model=Genre)

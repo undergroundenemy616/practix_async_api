@@ -22,12 +22,6 @@ class PersonResponseModel(BaseModel):
     film_ids: List[uuid.UUID] = []
 
 
-class PersonListResponseModel(BaseModel):
-    total_pages: int
-    page: int
-    objects: List[PersonResponseModel] = []
-
-
 class PersonFilmResponseModel(BaseModel):
     id: uuid.UUID
     title: str

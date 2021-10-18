@@ -7,6 +7,7 @@ from fastapi import Depends
 
 from db.elastic import get_elastic
 from db.redis import get_redis
+from models.film import Film
 from services.base_services.list_object_service import BaseListService
 from pydantic import BaseModel
 from models.person import Person
@@ -52,29 +53,23 @@ class PersonSearchListService(BaseListService):
 
 @lru_cache()
 def get_person_films_service(
-        index: str = 'person',
-        model: BaseModel = Person,
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> PersonFilmsListService:
-    return PersonFilmsListService(redis, elastic, index, model)
+    return PersonFilmsListService(redis, elastic, index='filmwork', model=Film)
 
 
 @lru_cache()
 def get_search_list_persons_service(
-        index: str = 'person',
-        model: BaseModel = Person,
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> PersonSearchListService:
-    return PersonSearchListService(redis, elastic, index, model)
+    return PersonSearchListService(redis, elastic, index='person', model=Person)
 
 
 @lru_cache()
 def get_retrieve_person_service(
-        index: str = 'person',
-        model: BaseModel = Person,
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> SingleObjectService:
-    return SingleObjectService(redis, elastic, index, model)
+    return SingleObjectService(redis, elastic, index='person', model=Person)
