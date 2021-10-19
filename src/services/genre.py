@@ -3,7 +3,6 @@ from functools import lru_cache
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
-from pydantic import BaseModel
 
 from db.elastic import get_elastic
 from db.redis import get_redis
@@ -18,10 +17,10 @@ class GenresListService(BaseListService):
 
     @staticmethod
     def get_elastic_query(size: int):
-        query = {"query": {
-            "match_all": {}
+        query = {'query': {
+            'match_all': {}
             },
-            "size": size
+            'size': size
         }
         return query
 

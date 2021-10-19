@@ -4,7 +4,6 @@ from typing import Optional
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
-from pydantic import BaseModel
 
 from db.elastic import get_elastic
 from db.redis import get_redis
@@ -17,20 +16,23 @@ class FilmsListService(BaseListService):
 
     @staticmethod
     def get_elastic_query(genre: Optional[str], sort: Optional[str]) -> dict:
+        field = sort.lstrip('-')
         query = {
-            "sort":
-                {sort[1:]: {"order": "desc"}} if sort[0] == '-' else {sort: {"order": "asc"}}
+            'sort':
+                {
+                    field: {'order': 'desc' if sort.startswith('-') else 'asc'}
+                }
         }
         if genre:
-            query["query"] = {"bool": {
-                "must":
+            query['query'] = {'bool': {
+                'must':
                     {
-                        "nested": {
-                            "path": "genres",
-                            "query": {
-                                "bool": {
-                                    "should":
-                                        {"term": {"genres.id": genre}}
+                        'nested': {
+                            'path': 'genres',
+                            'query': {
+                                'bool': {
+                                    'should':
+                                        {'term': {'genres.id': genre}}
                                 }
                             }
                         }
@@ -44,10 +46,10 @@ class FilmSearchService(BaseListService):
 
     @staticmethod
     def get_elastic_query(query: str) -> dict:
-        query = {"query": {
-            "multi_match": {
-                "query": query,
-                "fields": ["title", "description"]
+        query = {'query': {
+            'multi_match': {
+                'query': query,
+                'fields': ['title', 'description']
             }
         }
     }

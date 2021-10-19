@@ -1,11 +1,9 @@
 import logging
 from functools import lru_cache
-from typing import List
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
-from pydantic import BaseModel
 
 from db.elastic import get_elastic
 from db.redis import get_redis
@@ -22,7 +20,7 @@ FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5  # 5 минут
 
 class PersonFilmsListService(BaseListService):
     @staticmethod
-    def get_elastic_query(film_ids: List):
+    def get_elastic_query(film_ids: list):
         query = {'query': {
             'terms': {"_id": film_ids}
             }
@@ -33,7 +31,7 @@ class PersonFilmsListService(BaseListService):
     async def get_objects(self,
                           page_size: int = 100,
                           page_number: int = 0,
-                          **kwargs) -> List:
+                          **kwargs) -> list:
         doc = await self.elastic.get('person', kwargs.pop('person_id'))
         kwargs['film_ids'] = doc['_source']['film_ids']
         return await super().get_objects(page_size, page_number, **kwargs)
@@ -42,7 +40,7 @@ class PersonFilmsListService(BaseListService):
 class PersonSearchListService(BaseListService):
 
     @staticmethod
-    def get_elastic_query(query: List):
+    def get_elastic_query(query: list):
         query = {'query': {
             'match': {"full_name": query}
             }

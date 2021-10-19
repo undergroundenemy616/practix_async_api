@@ -1,6 +1,6 @@
 import logging
 from http import HTTPStatus
-from typing import List, Optional
+from typing import Optional
 
 from elasticsearch import NotFoundError
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -17,7 +17,7 @@ router = APIRouter()
 logging.basicConfig(level=logging.INFO)
 
 
-@router.get('', response_model=List[FilmListResponseModel])
+@router.get('', response_model=list[FilmListResponseModel])
 async def film_list(sort: str = Query('-rating'),
                     page_size: int = Query(20),
                     page_number: int = Query(1),
@@ -34,7 +34,7 @@ async def film_list(sort: str = Query('-rating'),
                                   rating=film.rating) for film in films_response]
 
 
-@router.get('/search', response_model=List[FilmListResponseModel])
+@router.get('/search', response_model=list[FilmListResponseModel])
 async def film_search(query: str = Query(...),
                       page_size: int = Query(20),
                       page_number: int = Query(1),

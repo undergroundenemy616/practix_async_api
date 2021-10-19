@@ -1,6 +1,5 @@
 import logging
 from http import HTTPStatus
-from typing import List
 
 from elasticsearch import NotFoundError
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -25,12 +24,12 @@ async def genre_details(genre_id: str, genre_service: SingleObjectService = Depe
     return GenreResponseModel(id=genre.id, name=genre.name, description=genre.description)
 
 
-@router.get('', response_model=List[GenreResponseModel], response_model_exclude={'description'})
+@router.get('', response_model=list[GenreResponseModel], response_model_exclude={'description'})
 async def genres_list(
         amount: int = Query(100),
         page_size: int = Query(20),
         page_number: int = Query(1),
-        genre_service: GenresListService = Depends(get_genre_list_service)) -> List[GenreResponseModel]:
+        genre_service: GenresListService = Depends(get_genre_list_service)) -> list[GenreResponseModel]:
     try:
         genres = await genre_service.get_objects(page_size, page_number, size=amount)
     except NotFoundError:

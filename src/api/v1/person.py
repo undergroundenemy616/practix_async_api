@@ -1,5 +1,4 @@
 from http import HTTPStatus
-from typing import List
 
 from elasticsearch import NotFoundError
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -15,7 +14,7 @@ from services.person import (PersonFilmsListService, PersonSearchListService,
 router = APIRouter()
 
 
-@router.get('/search', response_model=List[PersonResponseModel])
+@router.get('/search', response_model=list[PersonResponseModel])
 async def person_list(query: str = Query(...),
                       page_size: int = Query(20),
                       page_number: int = Query(1),
@@ -23,7 +22,7 @@ async def person_list(query: str = Query(...),
     try:
         persons_response = await person_service.get_objects(page_size, page_number, query=query)
     except ValidationError:
-        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="No such page")
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail='No such page')
     except NotFoundError:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')
     return [PersonResponseModel(id=person.id,
@@ -42,11 +41,11 @@ async def person_details(person_id: str,
     return PersonResponseModel(id=person.id, full_name=person.full_name, roles=person.roles, film_ids=person.film_ids)
 
 
-@router.get('/{person_id}/films', response_model=List[PersonFilmResponseModel], deprecated=True)
+@router.get('/{person_id}/films', response_model=list[PersonFilmResponseModel], deprecated=True)
 async def person_films_list(person_id: str,
                             page_size: int = Query(20),
                             page_number: int = Query(1),
-                            person_service: PersonFilmsListService = Depends(get_person_films_service)) -> List[PersonFilmResponseModel]:
+                            person_service: PersonFilmsListService = Depends(get_person_films_service)) -> list[PersonFilmResponseModel]:
     try:
         films = await person_service.get_objects(page_size, page_number, person_id=person_id)
     except NotFoundError:
