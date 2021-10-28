@@ -15,9 +15,6 @@ from services.base_services.single_object_service import SingleObjectService
 logging.basicConfig(level=logging.INFO)
 
 
-FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5  # 5 минут
-
-
 class PersonFilmsListService(BaseListService):
     @staticmethod
     def get_elastic_query(film_ids: list):

@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    ports:
+      - "9200:9200"
+
+  movies-redis:
+    image: redis:6.2.6-alpine
+    ports:
+      - "6379:6379"
+
+  movies-api:
+    build:
+      context: src/
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/code
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./.env
+    depends_on:
+      - elasticsearch
+      - movies-redis
+
+  test:
+    build:
+      context: tests/functional/
+      dockerfile: Dockerfile
+    entrypoint: >
+      sh -c "python3 /code/utils/wait_for_es.py
+      && python3 /code/utils/wait_for_redis.py"
+    volumes:
+      - ./tests/functional:/code
+    env_file:
+      - ./.env
+    depends_on:
+      - elasticsearch
+      - movies-redis
+      - movies-api
+
+

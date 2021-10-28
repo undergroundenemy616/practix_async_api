@@ -10,8 +10,6 @@ from models.genre import Genre
 from services.base_services.list_object_service import BaseListService
 from services.base_services.single_object_service import SingleObjectService
 
-FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5  # 5 минут
-
 
 class GenresListService(BaseListService):
 
