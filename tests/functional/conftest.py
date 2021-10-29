@@ -1,3 +1,4 @@
+import asyncio
 from dataclasses import dataclass
 from urllib.parse import urljoin
 
@@ -9,10 +10,8 @@ from multidict import CIMultiDictProxy
 
 from settings import TestSettings
 
-SERVICE_URL = 'http://127.0.0.1:8000'
-API_URL = urljoin(SERVICE_URL, '/api/v1')
-
 config = TestSettings()
+SERVICE_URL = f'http://{config.app_host}:{config.app_port}'
 
 
 @dataclass
@@ -20,6 +19,13 @@ class HTTPResponse:
     body: dict
     headers: CIMultiDictProxy[str]
     status: int
+
+
+@pytest.fixture(scope='session')
+def event_loop():
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
 
 
 @pytest.fixture(scope='session')
@@ -33,7 +39,8 @@ async def es_client():
 async def redis_client():
     client = await aioredis.create_redis_pool((config.redis_host, config.redis_port), minsize=10, maxsize=20)
     yield client
-    await client.close()
+    client.close()
+    await client.wait_closed()
 
 
 @pytest.fixture(scope='session')
@@ -47,7 +54,7 @@ async def session():
 def make_get_request(session):
     async def inner(method: str, params: dict = None) -> HTTPResponse:
         params = params or {}
-        url = urljoin(API_URL, method)
+        url = urljoin(SERVICE_URL, method)
         async with session.get(url, params=params) as response:
             return HTTPResponse(
                 body=await response.json(),
