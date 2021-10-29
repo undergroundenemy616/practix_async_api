@@ -5,8 +5,8 @@ from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
 
-from db.elastic import get_elastic
-from db.redis import get_redis
+from db.elastic import get_elastic, ElasticAdapter
+from db.redis import get_redis, RedisAdapter
 from models.film import Film
 from models.person import Person
 from services.base_services.list_object_service import BaseListService
@@ -29,7 +29,7 @@ class PersonFilmsListService(BaseListService):
                           page_size: int = 100,
                           page_number: int = 0,
                           **kwargs) -> list:
-        doc = await self.elastic.get('person', kwargs.pop('person_id'))
+        doc = await self.db_adapter.get('person', kwargs.pop('person_id'))
         kwargs['film_ids'] = doc['_source']['film_ids']
         return await super().get_objects(page_size, page_number, **kwargs)
 
@@ -50,7 +50,11 @@ def get_person_films_service(
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> PersonFilmsListService:
-    return PersonFilmsListService(redis, elastic, index='filmwork', model=Film)
+    index = 'filmwork'
+    model = Film
+    cache_adapter = RedisAdapter(redis_instance=redis, model=model, index=index)
+    db_adapter = ElasticAdapter(elastic=elastic, model=model, index=index)
+    return PersonFilmsListService(cache_adapter=cache_adapter, db_adapter=db_adapter)
 
 
 @lru_cache()
@@ -58,7 +62,11 @@ def get_search_list_persons_service(
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> PersonSearchListService:
-    return PersonSearchListService(redis, elastic, index='person', model=Person)
+    index = 'person'
+    model = Person
+    cache_adapter = RedisAdapter(redis_instance=redis, model=model, index=index)
+    db_adapter = ElasticAdapter(elastic=elastic, model=model, index=index)
+    return PersonSearchListService(cache_adapter=cache_adapter, db_adapter=db_adapter)
 
 
 @lru_cache()
@@ -66,4 +74,8 @@ def get_retrieve_person_service(
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> SingleObjectService:
-    return SingleObjectService(redis, elastic, index='person', model=Person)
+    index = 'person'
+    model = Person
+    cache_adapter = RedisAdapter(redis_instance=redis, model=model, index=index)
+    db_adapter = ElasticAdapter(elastic=elastic, model=model, index=index)
+    return SingleObjectService(cache_adapter=cache_adapter, db_adapter=db_adapter)
