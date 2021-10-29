@@ -14,7 +14,13 @@ router = APIRouter()
 logging.basicConfig(level=logging.INFO)
 
 
-@router.get('/{genre_id}', response_model=GenreResponseModel)
+@router.get('/{genre_id}',
+            response_model=GenreResponseModel,
+            summary="Страница жанра",
+            description="Страница с детализацией по жанру",
+            response_description="Название, описание жанра",
+            tags=['Детализация жанра']
+            )
 async def genre_details(genre_id: str, genre_service: SingleObjectService = Depends(get_genre_retrieve_service)) -> GenreResponseModel:
     try:
         genre = await genre_service.get_by_id(genre_id)
@@ -24,7 +30,13 @@ async def genre_details(genre_id: str, genre_service: SingleObjectService = Depe
     return GenreResponseModel(id=genre.id, name=genre.name, description=genre.description)
 
 
-@router.get('', response_model=list[GenreResponseModel], response_model_exclude={'description'})
+@router.get('',
+            response_model=list[GenreResponseModel],
+            summary="Список жанров",
+            description="Список жанров, По умолчанию - 20 объектов на страницу",
+            response_description="Название жанров",
+            tags=['Список жанров'],
+            response_model_exclude={'description'})
 async def genres_list(
         amount: int = Query(100),
         page_size: int = Query(20),

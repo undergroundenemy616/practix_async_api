@@ -17,7 +17,14 @@ router = APIRouter()
 logging.basicConfig(level=logging.INFO)
 
 
-@router.get('', response_model=list[FilmListResponseModel])
+@router.get('',
+            response_model=list[FilmListResponseModel],
+            summary="Список кинопроизведений",
+            description="Список кинопроизведений, отсортированный по рейтингу. "
+                        "По умолчанию - 20 объектов на страницу",
+            response_description="Название и рейтинг фильма",
+            tags=['Список кинопроизведений']
+            )
 async def film_list(sort: str = Query('-rating'),
                     page_size: int = Query(20),
                     page_number: int = Query(1),
@@ -34,7 +41,13 @@ async def film_list(sort: str = Query('-rating'),
                                   rating=film.rating) for film in films_response]
 
 
-@router.get('/search', response_model=list[FilmListResponseModel])
+@router.get('/search',
+            response_model=list[FilmListResponseModel],
+            summary="Поиск кинопроизведений",
+            description="Полнотекстовый поиск по кинопроизведениям",
+            response_description="Название и рейтинг кинопроизведения",
+            tags=['Полнотекстовый поиск по кинопроизведениям']
+            )
 async def film_search(query: str = Query(...),
                       page_size: int = Query(20),
                       page_number: int = Query(1),
@@ -50,7 +63,13 @@ async def film_search(query: str = Query(...),
                                   rating=film.rating) for film in films_response]
 
 
-@router.get('/{film_id}', response_model=FilmResponseModel)
+@router.get('/{film_id}',
+            response_model=FilmResponseModel,
+            summary="Страница кинопроизведения",
+            description="Страница с детализацией по кинопроизведению",
+            response_description="Название, рейтинг, описание, жанры, актеры, сценаристы и режиссеры кинопроизведения",
+            tags=['Детализация кинопроизведения']
+            )
 async def film_details(film_id: str, film_service: SingleObjectService = Depends(get_retrieve_film_service)) -> FilmResponseModel:
     try:
         film = await film_service.get_by_id(film_id)
