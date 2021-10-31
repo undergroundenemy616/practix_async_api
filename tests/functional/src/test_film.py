@@ -1,7 +1,7 @@
 import json
 import pytest
 
-from ..testdata.filmwork import TEST_DATA, INDEX_FILM_BODY, INDEX_FILM_NAME
+from testdata.filmwork import TEST_DATA, INDEX_FILM_BODY, INDEX_FILM_NAME
 
 
 @pytest.fixture(scope='module')
@@ -21,7 +21,7 @@ async def test_list_films(make_get_request, set_films_test_data):
     assert len(response.body) == 5
 
 @pytest.mark.asyncio
-async def test_list_genre_with_size(make_get_request, set_films_test_data):
+async def test_list_film_with_size(make_get_request, set_films_test_data):
     response = await make_get_request('/api/v1/film?page_size=2')
 
     assert response.status == 200
@@ -30,23 +30,23 @@ async def test_list_genre_with_size(make_get_request, set_films_test_data):
 
 @pytest.mark.asyncio
 async def test_retrieve_film(make_get_request, set_films_test_data):
-    test_data_genre = TEST_DATA[0]
+    test_data_film = TEST_DATA[0]
     response = await make_get_request(f"/api/v1/genre/{test_data_genre['id']}")
     assert response.status == 200
-    assert response.body['id'] == test_data_genre['id']
-    assert response.body['type'] == test_data_genre['type']
-    assert response.body['title'] == test_data_genre['title']
+    assert response.body['id'] == test_data_film['id']
+    assert response.body['type'] == test_data_film['type']
+    assert response.body['title'] == test_data_film['title']
 
 
 
 @pytest.mark.asyncio
-async def test_genre_cache(make_get_request, set_films_test_data, redis_client):
-    test_data_genre = TEST_DATA[0]
+async def test_film_cache(make_get_request, set_films_test_data, redis_client):
+    test_data_film = TEST_DATA[0]
     response = await make_get_request(f"/api/v1/film/{test_data_genre['id']}")
 
     assert response.status == 200
 
-    cached_data = await redis_client.get(test_data_genre['id'])
+    cached_data = await redis_client.get(test_data_film['id'])
     cached_data = json.loads(cached_data)
-    assert test_data_genre['type'] == cached_data['type']
-    assert test_data_genre['title'] == cached_data['title']
+    assert test_data_film['type'] == cached_data['type']
+    assert test_data_film['title'] == cached_data['title']
