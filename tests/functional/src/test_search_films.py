@@ -4,7 +4,6 @@ import pytest
 
 from testdata.filmwork import INDEX_FILM_NAME, TEST_DATA, INDEX_FILM_BODY
 
-
 @pytest.fixture(scope='module')
 async def set_films_test_data(es_client):
     await es_client.indices.create(index=INDEX_FILM_NAME,
