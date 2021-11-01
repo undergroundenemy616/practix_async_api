@@ -12,11 +12,6 @@ from utils import CACHE_EXPIRE_IN_SECONDS, get_redis_key_hash
 redis: Optional[Redis] = None
 
 
-# Функция понадобится при внедрении зависимостей
-async def get_redis() -> Redis:
-    return redis
-
-
 class AbstractCacheAdapter:
 
     @abstractmethod
@@ -27,46 +22,22 @@ class AbstractCacheAdapter:
     async def put_objects_to_cache(self, *args):
         pass
 
-    @abstractmethod
-    async def object_from_cache(self, *args):
-        pass
-
-    @abstractmethod
-    async def put_object_to_cache(self, *args):
-        pass
-
 
 class RedisAdapter(AbstractCacheAdapter):
-    def __init__(self, redis_instance: Redis, model: Any, index: str):
+    def __init__(self, redis_instance: Redis):
         self.redis = redis_instance
-        self.model = model
-        self.index = index
 
     @backoff.on_exception(backoff.expo, ConnectionClosedError)
-    async def get_objects_from_cache(self, query: dict, page_size: int,
-                                     page_number: int) -> Optional[list]:
-        redis_key = get_redis_key_hash(self.index, query, page_size, page_number)
+    async def get_objects_from_cache(self, redis_key: str) -> Optional[list]:
         data = await self.redis.get(redis_key)
         if not data:
             return
-        return [self.model.parse_raw(document) for document in json.loads(data)]
+        return data
 
     @backoff.on_exception(backoff.expo, ConnectionClosedError)
-    async def put_objects_to_cache(self, objects: list, query: dict, page_size: int,
-                                   page_number: int):
-        redis_key = get_redis_key_hash(self.index, query, page_size, page_number)
-        await self.redis.set(redis_key,
-                             json.dumps([document.json() for document in objects]),
-                             expire=CACHE_EXPIRE_IN_SECONDS)
+    async def put_objects_to_cache(self, objects: list or dict, redis_key: str):
+        await self.redis.set(redis_key, objects, expire=CACHE_EXPIRE_IN_SECONDS)
 
-    @backoff.on_exception(backoff.expo, ConnectionClosedError)
-    async def object_from_cache(self, object_id: str):
-        data = await self.redis.get(object_id)
-        if not data:
-            return None
-        obj = self.model.parse_raw(data)
-        return obj
 
-    @backoff.on_exception(backoff.expo, ConnectionClosedError)
-    async def put_object_to_cache(self, object_):
-        await self.redis.set(str(object_.id), object_.json(), expire=CACHE_EXPIRE_IN_SECONDS)
+async def get_redis() -> RedisAdapter:
+    return RedisAdapter(redis_instance=redis)

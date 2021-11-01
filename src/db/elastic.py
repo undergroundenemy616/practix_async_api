@@ -7,39 +7,37 @@ from abc import abstractmethod
 es: Optional[AsyncElasticsearch] = None
 
 
-async def get_elastic() -> AsyncElasticsearch:
-    return es
-
-
 class AbstractDBAdapter:
 
     @abstractmethod
-    async def get_objects_from_elastic(self, *args):
+    async def get_objects_from_db(self, *args):
         pass
 
     @abstractmethod
-    async def get_object_from_elastic(self, *args):
+    async def get_object_from_db(self, *args):
         pass
 
 
 class ElasticAdapter(AbstractDBAdapter):
-    def __init__(self, elastic: AsyncElasticsearch, model: Any, index: str):
+    def __init__(self, elastic: AsyncElasticsearch):
         self.elastic = elastic
-        self.model = model
-        self.index = index
 
     @backoff.on_exception(backoff.expo, ConnectionError)
-    async def get_objects_from_elastic(self, query: dict, page_size: int, page_number: int) -> list:
+    async def get_objects_from_db(self, index: str, model: Any, query: dict, page_size: int, page_number: int) -> list:
         from_ = page_size * (page_number - 1)
-        data = await self.elastic.search(index=self.index,
+        data = await self.elastic.search(index=index,
                                          body=query,
                                          size=page_size,
                                          from_=from_)
 
         hits = data['hits']['hits']
-        return [self.model(**document['_source']) for document in hits]
+        return [model(**document['_source']) for document in hits]
 
     @backoff.on_exception(backoff.expo, ConnectionError)
-    async def get_object_from_elastic(self, object_id: str):
-        doc = await self.elastic.get(self.index, object_id)
-        return self.model(**doc['_source'])
+    async def get_object_from_db(self, index: str, model: Any, object_id: str):
+        doc = await self.elastic.get(index, object_id)
+        return model(**doc['_source'])
+
+
+async def get_elastic() -> ElasticAdapter:
+    return ElasticAdapter(elastic=es)

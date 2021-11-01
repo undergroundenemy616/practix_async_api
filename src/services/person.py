@@ -1,8 +1,6 @@
 import logging
 from functools import lru_cache
 
-from aioredis import Redis
-from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
 
 from db.elastic import get_elastic, ElasticAdapter
@@ -47,35 +45,23 @@ class PersonSearchListService(BaseListService):
 
 @lru_cache()
 def get_person_films_service(
-        redis: Redis = Depends(get_redis),
-        elastic: AsyncElasticsearch = Depends(get_elastic),
+        redis: RedisAdapter = Depends(get_redis),
+        elastic: ElasticAdapter = Depends(get_elastic),
 ) -> PersonFilmsListService:
-    index = 'filmwork'
-    model = Film
-    cache_adapter = RedisAdapter(redis_instance=redis, model=model, index=index)
-    db_adapter = ElasticAdapter(elastic=elastic, model=model, index=index)
-    return PersonFilmsListService(cache_adapter=cache_adapter, db_adapter=db_adapter)
+    return PersonFilmsListService(cache_adapter=redis, db_adapter=elastic, index='filmwork', model=Film)
 
 
 @lru_cache()
 def get_search_list_persons_service(
-        redis: Redis = Depends(get_redis),
-        elastic: AsyncElasticsearch = Depends(get_elastic),
+        redis: RedisAdapter = Depends(get_redis),
+        elastic: ElasticAdapter = Depends(get_elastic),
 ) -> PersonSearchListService:
-    index = 'person'
-    model = Person
-    cache_adapter = RedisAdapter(redis_instance=redis, model=model, index=index)
-    db_adapter = ElasticAdapter(elastic=elastic, model=model, index=index)
-    return PersonSearchListService(cache_adapter=cache_adapter, db_adapter=db_adapter)
+    return PersonSearchListService(cache_adapter=redis, db_adapter=elastic, index='person', model=Person)
 
 
 @lru_cache()
 def get_retrieve_person_service(
-        redis: Redis = Depends(get_redis),
-        elastic: AsyncElasticsearch = Depends(get_elastic),
+        redis: RedisAdapter = Depends(get_redis),
+        elastic: ElasticAdapter = Depends(get_elastic),
 ) -> SingleObjectService:
-    index = 'person'
-    model = Person
-    cache_adapter = RedisAdapter(redis_instance=redis, model=model, index=index)
-    db_adapter = ElasticAdapter(elastic=elastic, model=model, index=index)
-    return SingleObjectService(cache_adapter=cache_adapter, db_adapter=db_adapter)
+    return SingleObjectService(cache_adapter=redis, db_adapter=elastic, index='person', model=Person)

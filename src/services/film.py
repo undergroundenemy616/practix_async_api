@@ -1,8 +1,6 @@
 from functools import lru_cache
 from typing import Optional
 
-from aioredis import Redis
-from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
 
 from db.elastic import get_elastic, ElasticAdapter
@@ -58,35 +56,23 @@ class FilmSearchService(BaseListService):
 
 @lru_cache()
 def get_list_film_service(
-        redis: Redis = Depends(get_redis),
-        elastic: AsyncElasticsearch = Depends(get_elastic),
+        redis: RedisAdapter = Depends(get_redis),
+        elastic: ElasticAdapter = Depends(get_elastic),
 ) -> FilmsListService:
-    index = 'filmwork'
-    model = Film
-    cache_adapter = RedisAdapter(redis_instance=redis, model=model, index=index)
-    db_adapter = ElasticAdapter(elastic=elastic, model=model, index=index)
-    return FilmsListService(cache_adapter=cache_adapter, db_adapter=db_adapter)
+    return FilmsListService(cache_adapter=redis, db_adapter=elastic, index='filmwork', model=Film)
 
 
 @lru_cache()
 def get_search_list_persons_service(
-        redis: Redis = Depends(get_redis),
-        elastic: AsyncElasticsearch = Depends(get_elastic),
+        redis: RedisAdapter = Depends(get_redis),
+        elastic: ElasticAdapter = Depends(get_elastic),
 ) -> FilmSearchService:
-    index = 'filmwork'
-    model = Film
-    cache_adapter = RedisAdapter(redis_instance=redis, model=model, index=index)
-    db_adapter = ElasticAdapter(elastic=elastic, model=model, index=index)
-    return FilmSearchService(cache_adapter=cache_adapter, db_adapter=db_adapter)
+    return FilmSearchService(cache_adapter=redis, db_adapter=elastic, index='filmwork', model=Film)
 
 
 @lru_cache()
 def get_retrieve_film_service(
-        redis: Redis = Depends(get_redis),
-        elastic: AsyncElasticsearch = Depends(get_elastic),
+        redis: RedisAdapter = Depends(get_redis),
+        elastic: ElasticAdapter = Depends(get_elastic),
 ) -> SingleObjectService:
-    index = 'filmwork'
-    model = Film
-    cache_adapter = RedisAdapter(redis_instance=redis, model=model, index=index)
-    db_adapter = ElasticAdapter(elastic=elastic, model=model, index=index)
-    return SingleObjectService(cache_adapter=cache_adapter, db_adapter=db_adapter)
+    return SingleObjectService(cache_adapter=redis, db_adapter=elastic, index='filmwork', model=Film)

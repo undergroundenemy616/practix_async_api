@@ -1,7 +1,5 @@
 from functools import lru_cache
 
-from aioredis import Redis
-from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
 
 from db.elastic import get_elastic
@@ -27,23 +25,15 @@ class GenresListService(BaseListService):
 
 @lru_cache()
 def get_genre_list_service(
-        redis: Redis = Depends(get_redis),
-        elastic: AsyncElasticsearch = Depends(get_elastic),
+        redis: RedisAdapter = Depends(get_redis),
+        elastic: ElasticAdapter = Depends(get_elastic),
 ) -> GenresListService:
-    index = 'genre'
-    model = Genre
-    cache_adapter = RedisAdapter(redis_instance=redis, model=model, index=index)
-    db_adapter = ElasticAdapter(elastic=elastic, model=model, index=index)
-    return GenresListService(cache_adapter=cache_adapter, db_adapter=db_adapter)
+    return GenresListService(cache_adapter=redis, db_adapter=elastic, index='genre', model=Genre)
 
 
 @lru_cache()
 def get_genre_retrieve_service(
-        redis: Redis = Depends(get_redis),
-        elastic: AsyncElasticsearch = Depends(get_elastic),
+        redis: RedisAdapter = Depends(get_redis),
+        elastic: ElasticAdapter = Depends(get_elastic),
 ) -> SingleObjectService:
-    index = 'genre'
-    model = Genre
-    cache_adapter = RedisAdapter(redis_instance=redis, model=model, index=index)
-    db_adapter = ElasticAdapter(elastic=elastic, model=model, index=index)
-    return SingleObjectService(cache_adapter=cache_adapter, db_adapter=db_adapter)
+    return SingleObjectService(cache_adapter=redis, db_adapter=elastic, index='genre', model=Genre)
