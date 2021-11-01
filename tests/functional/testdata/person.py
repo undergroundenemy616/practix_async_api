@@ -96,7 +96,7 @@ TEST_DATA = [
             "actor"
         ],
         "film_ids": [
-            "f927a766-742d-4f2a-9f3b-bb6e65a0c00d"
+            "319df05f-c5d9-4389-a84a-a43e695bf000"
         ]
     },
     {"index": {"_index": "person", "_id": "900a4e34-0e3a-47c5-9c9a-06f73d11f395"}},
@@ -126,11 +126,5 @@ TEST_DATA = [
     {
         "id": "222c4b92-1895-40c7-8b61-98d31b660668",
         "full_name": "Samuel L. Jackson",
-        "roles": [
-            "actor"
-        ],
-        "film_ids": [
-            "0f05c4a6-7fc6-4b2a-9ecc-551979316aea"
-        ]
     },
 ]
