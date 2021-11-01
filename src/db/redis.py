@@ -7,8 +7,7 @@ from aioredis import ConnectionClosedError
 
 from aioredis import Redis
 
-from utils import CACHE_EXPIRE_IN_SECONDS
-
+from utils import CACHE_EXPIRE_IN_SECONDS, get_redis_key_hash
 
 redis: Optional[Redis] = None
 
@@ -45,23 +44,18 @@ class RedisAdapter(AbstractCacheAdapter):
 
     @backoff.on_exception(backoff.expo, ConnectionClosedError)
     async def get_objects_from_cache(self, query: dict, page_size: int,
-                                      page_number: int) -> Optional[list]:
-
-        data = await self.redis.get(json.dumps({'index': self.index,
-                                                'query': query,
-                                                'page_size': page_size,
-                                                'page_number': page_number}))
+                                     page_number: int) -> Optional[list]:
+        redis_key = get_redis_key_hash(self.index, query, page_size, page_number)
+        data = await self.redis.get(redis_key)
         if not data:
             return
         return [self.model.parse_raw(document) for document in json.loads(data)]
 
     @backoff.on_exception(backoff.expo, ConnectionClosedError)
     async def put_objects_to_cache(self, objects: list, query: dict, page_size: int,
-                                    page_number: int):
-        await self.redis.set(json.dumps({'index': self.index,
-                                         'query': query,
-                                         'page_size': page_size,
-                                         'page_number': page_number}),
+                                   page_number: int):
+        redis_key = get_redis_key_hash(self.index, query, page_size, page_number)
+        await self.redis.set(redis_key,
                              json.dumps([document.json() for document in objects]),
                              expire=CACHE_EXPIRE_IN_SECONDS)
 
@@ -70,8 +64,8 @@ class RedisAdapter(AbstractCacheAdapter):
         data = await self.redis.get(object_id)
         if not data:
             return None
-        object_ = self.model.parse_raw(data)
-        return object_
+        obj = self.model.parse_raw(data)
+        return obj
 
     @backoff.on_exception(backoff.expo, ConnectionClosedError)
     async def put_object_to_cache(self, object_):

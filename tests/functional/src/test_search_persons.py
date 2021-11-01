@@ -1,8 +1,12 @@
 import json
+from http import HTTPStatus
 
 import pytest
 
 from testdata.person import INDEX_PERSON_NAME, TEST_DATA, INDEX_PERSON_BODY
+from utils.utils import get_redis_key_hash
+
+pytestmark = pytest.mark.asyncio
 
 
 @pytest.fixture(scope='module')
@@ -14,20 +18,18 @@ async def set_persons_test_data(es_client):
     return result['errors'] is False
 
 
-@pytest.mark.asyncio
 async def test_search_person(make_get_request, set_persons_test_data):
     response = await make_get_request('/api/v1/person/search?query=samuel')
 
-    assert response.status == 200
+    assert response.status == HTTPStatus.OK
     assert len(response.body) == 1
     assert response.body[0]['id'] == '222c4b92-1895-40c7-8b61-98d31b660668'
 
 
-@pytest.mark.asyncio
 async def test_search_persons(make_get_request, set_persons_test_data):
     response = await make_get_request('/api/v1/person/search?query=hall')
 
-    assert response.status == 200
+    assert response.status == HTTPStatus.OK
     assert len(response.body) == 3
     assert set(film['full_name'] for film in response.body) - {'Hall Hood', 'Arsenio Hall', 'Connie Hall'} == set()
 
@@ -37,29 +39,23 @@ async def test_search_persons(make_get_request, set_persons_test_data):
     assert all(check_structure(object_) for object_ in response.body)
 
 
-@pytest.mark.asyncio
 async def test_search_persons_with_size(make_get_request, set_persons_test_data):
     response = await make_get_request('/api/v1/person/search?query=hall&page_size=2')
 
-    assert response.status == 200
+    assert response.status == HTTPStatus.OK
     assert len(response.body) == 2
 
 
-@pytest.mark.asyncio
 async def test_search_persons_cache(make_get_request, set_persons_test_data, redis_client):
     response = await make_get_request('/api/v1/person/search?query=hall&page_size=2')
 
-    assert response.status == 200
+    assert response.status == HTTPStatus.OK
     assert len(response.body) == 2
     elasticsearch_query = {'query': {
-            'match': {"full_name": 'hall'}
-            }
-        }
-
-    key_for_redis = json.dumps({'index': 'person',
-                                'query': elasticsearch_query,
-                                'page_size': 2,
-                                'page_number': 1})
+        'match': {"full_name": 'hall'}
+    }
+    }
+    key_for_redis = get_redis_key_hash('person', elasticsearch_query, 2, 1)
 
     cached_data = await redis_client.get(key_for_redis)
     cached_data = json.loads(cached_data)
@@ -67,9 +63,8 @@ async def test_search_persons_cache(make_get_request, set_persons_test_data, red
     assert set(film['full_name'] for film in response.body) - {'Arsenio Hall', 'Hall Hood'} == set()
 
 
-@pytest.mark.asyncio
 async def test_search_persons_not_found(make_get_request, set_persons_test_data):
     response = await make_get_request('/api/v1/person/search?query=hello')
 
-    assert response.status == 200
+    assert response.status == HTTPStatus.OK
     assert len(response.body) == 0

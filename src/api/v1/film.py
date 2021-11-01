@@ -58,9 +58,7 @@ async def film_search(query: str = Query(...),
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="No such page")
     except NotFoundError:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
-    return [FilmListResponseModel(id=film.id,
-                                  title=film.title,
-                                  rating=film.rating) for film in films_response]
+    return [FilmListResponseModel(**film.dict()) for film in films_response]
 
 
 @router.get('/{film_id}',
@@ -75,11 +73,4 @@ async def film_details(film_id: str, film_service: SingleObjectService = Depends
         film = await film_service.get_by_id(film_id)
     except NotFoundError:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
-    return FilmResponseModel(id=film.id,
-                             title=film.title,
-                             rating=film.rating,
-                             description=film.description,
-                             genre=film.genres,
-                             actors=film.actors,
-                             writers=film.writers,
-                             directors=film.directors)
+    return FilmResponseModel(**film.dict())
