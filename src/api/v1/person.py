@@ -31,10 +31,7 @@ async def person_list(query: str = Query(...),
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail='No such page')
     except NotFoundError:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')
-    return [PersonResponseModel(id=person.id,
-                                full_name=person.full_name,
-                                roles=person.roles,
-                                film_ids=person.film_ids) for person in persons_response]
+    return [PersonResponseModel(**person.dict()) for person in persons_response]
 
 
 @router.get('/{person_id}',
@@ -50,7 +47,7 @@ async def person_details(person_id: str,
         person = await person_service.get_by_id(person_id)
     except NotFoundError:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')
-    return PersonResponseModel(id=person.id, full_name=person.full_name, roles=person.roles, film_ids=person.film_ids)
+    return PersonResponseModel(**person.dict())
 
 
 @router.get('/{person_id}/films',
@@ -68,4 +65,4 @@ async def person_films_list(person_id: str,
         films = await person_service.get_objects(page_size, page_number, person_id=person_id)
     except NotFoundError:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='persons films not found')
-    return [PersonFilmResponseModel(id=film.id, title=film.title, rating=film.rating) for film in films]
+    return [PersonFilmResponseModel(**film.dict()) for film in films]

@@ -1,7 +1,11 @@
 import json
+from http import HTTPStatus
+
 import pytest
 
 from testdata.filmwork import TEST_DATA, INDEX_FILM_BODY, INDEX_FILM_NAME
+
+pytestmark = pytest.mark.asyncio
 
 
 @pytest.fixture(scope='module')
@@ -13,38 +17,34 @@ async def set_films_test_data(es_client):
     return result['errors'] is False
 
 
-@pytest.mark.asyncio
 async def test_list_films(make_get_request, set_films_test_data):
     response = await make_get_request('/api/v1/film')
 
-    assert response.status == 200
+    assert response.status == HTTPStatus.OK
     assert len(response.body) == 5
 
-@pytest.mark.asyncio
+
 async def test_list_film_with_size(make_get_request, set_films_test_data):
     response = await make_get_request('/api/v1/film?page_size=2')
 
-    assert response.status == 200
+    assert response.status == HTTPStatus.OK
     assert len(response.body) == 2
 
 
-@pytest.mark.asyncio
 async def test_retrieve_film(make_get_request, set_films_test_data):
-    test_data_film = TEST_DATA[0]
-    response = await make_get_request(f"/api/v1/genre/{test_data_genre['id']}")
-    assert response.status == 200
+    test_data_film = TEST_DATA[1]
+    response = await make_get_request(f"/api/v1/film/{test_data_film['id']}")
+    assert response.status == HTTPStatus.OK
     assert response.body['id'] == test_data_film['id']
-    assert response.body['type'] == test_data_film['type']
+    assert response.body['rating'] == test_data_film['rating']
     assert response.body['title'] == test_data_film['title']
 
 
-
-@pytest.mark.asyncio
 async def test_film_cache(make_get_request, set_films_test_data, redis_client):
-    test_data_film = TEST_DATA[0]
-    response = await make_get_request(f"/api/v1/film/{test_data_genre['id']}")
+    test_data_film = TEST_DATA[1]
+    response = await make_get_request(f"/api/v1/film/{test_data_film['id']}")
 
-    assert response.status == 200
+    assert response.status == HTTPStatus.OK
 
     cached_data = await redis_client.get(test_data_film['id'])
     cached_data = json.loads(cached_data)

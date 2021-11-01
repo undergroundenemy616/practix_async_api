@@ -27,7 +27,7 @@ async def genre_details(genre_id: str, genre_service: SingleObjectService = Depe
     except NotFoundError:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='genre not found')
 
-    return GenreResponseModel(id=genre.id, name=genre.name, description=genre.description)
+    return GenreResponseModel(**genre.dict())
 
 
 @router.get('',
@@ -46,4 +46,4 @@ async def genres_list(
         genres = await genre_service.get_objects(page_size, page_number, size=amount)
     except NotFoundError:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='genres not found')
-    return [GenreResponseModel(id=genre.id, name=genre.name) for genre in genres]
+    return [GenreResponseModel(**genre.dict()) for genre in genres]
