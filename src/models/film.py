@@ -16,7 +16,7 @@ class FilmGenre(BaseModel):
 
 
 class Film(CustomBaseModel):
-    id: str
+    id: uuid.UUID
     rating: float
     type: str
     title: str
@@ -32,7 +32,7 @@ class Film(CustomBaseModel):
 
 
 class FilmResponseModel(BaseModel):
-    id: str
+    id: uuid.UUID
     title: str
     rating: float
     description: str = None

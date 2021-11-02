@@ -126,5 +126,7 @@ TEST_DATA = [
     {
         "id": "222c4b92-1895-40c7-8b61-98d31b660668",
         "full_name": "Samuel L. Jackson",
+        "roles": [],
+        "film_ids": []
     },
 ]

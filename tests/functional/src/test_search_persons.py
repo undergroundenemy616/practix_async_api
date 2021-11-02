@@ -4,7 +4,7 @@ from http import HTTPStatus
 import pytest
 
 from testdata.person import INDEX_PERSON_NAME, TEST_DATA, INDEX_PERSON_BODY
-from utils.utils import get_redis_key_hash
+from utils.utils import get_expected_hash
 
 pytestmark = pytest.mark.asyncio
 
@@ -36,7 +36,7 @@ async def test_search_persons(make_get_request, set_persons_test_data):
     def check_structure(one_object_structure: dict):
         return set(one_object_structure.keys()) - {'id', 'full_name', 'roles', 'film_ids'} == set()
 
-    assert all(check_structure(object_) for object_ in response.body)
+    assert all(check_structure(obj) for obj in response.body)
 
 
 async def test_search_persons_with_size(make_get_request, set_persons_test_data):
@@ -51,16 +51,19 @@ async def test_search_persons_cache(make_get_request, set_persons_test_data, red
 
     assert response.status == HTTPStatus.OK
     assert len(response.body) == 2
+
     elasticsearch_query = {'query': {
         'match': {"full_name": 'hall'}
+        }
     }
-    }
-    key_for_redis = get_redis_key_hash('person', elasticsearch_query, 2, 1)
+    key_for_redis = get_expected_hash('person', elasticsearch_query, 2, 1)
 
     cached_data = await redis_client.get(key_for_redis)
     cached_data = json.loads(cached_data)
+
     assert len(cached_data) == 2
-    assert set(film['full_name'] for film in response.body) - {'Arsenio Hall', 'Hall Hood'} == set()
+    assert set(person['full_name'] for person in response.body) - set(json.loads(person)['full_name']
+                                                                      for person in cached_data) == set()
 
 
 async def test_search_persons_not_found(make_get_request, set_persons_test_data):

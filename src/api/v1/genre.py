@@ -1,4 +1,5 @@
 import logging
+import uuid
 from http import HTTPStatus
 
 from elasticsearch import NotFoundError
@@ -21,7 +22,7 @@ logging.basicConfig(level=logging.INFO)
             response_description="Название, описание жанра",
             tags=['Детализация жанра']
             )
-async def genre_details(genre_id: str, genre_service: SingleObjectService = Depends(get_genre_retrieve_service)) -> GenreResponseModel:
+async def genre_details(genre_id: uuid.UUID, genre_service: SingleObjectService = Depends(get_genre_retrieve_service)) -> GenreResponseModel:
     try:
         genre = await genre_service.get_by_id(genre_id)
     except NotFoundError:

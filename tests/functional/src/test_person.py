@@ -32,6 +32,7 @@ async def set_films_test_data(es_client):
 async def test_get_person(make_get_request, set_person_test_data):
     test_data_person = TEST_DATA[1]
     lookup_person_id = test_data_person['id']
+
     response = await make_get_request(f"/api/v1/person/{lookup_person_id}")
 
     assert response.status == HTTPStatus.OK
@@ -40,16 +41,8 @@ async def test_get_person(make_get_request, set_person_test_data):
 
 
 @pytest.mark.asyncio
-async def test_get_personm_unknown_id(make_get_request):
+async def test_get_person_unknown_id(make_get_request):
     response_not_found = await make_get_request('/api/v1/person/319df05f-c5d9-4389-a84a-a43e695bf444')
-
-    assert response_not_found.status == HTTPStatus.NOT_FOUND
-    assert 'detail' in response_not_found.body
-
-
-@pytest.mark.asyncio
-async def test_get_person_invalid_id(make_get_request):
-    response_not_found = await make_get_request('/api/v1/person/-10000')
 
     assert response_not_found.status == HTTPStatus.NOT_FOUND
     assert 'detail' in response_not_found.body
@@ -73,12 +66,13 @@ async def test_person_cache(make_get_request, set_person_test_data, redis_client
 async def test_person_with_single_films(make_get_request, set_person_test_data, set_films_test_data):
     test_data_person = TEST_DATA[3]
     lookup_person_id = test_data_person['id']
-    person_film_endpoint = f'/person/{lookup_person_id}/film'
+    person_film_endpoint = f'/api/v1/person/{lookup_person_id}/films'
+
     response = await make_get_request(person_film_endpoint)
 
     assert response.status == HTTPStatus.OK
     assert len(response.body) == 1
-    assert response.body[0]['uuid'] == '319df05f-c5d9-4389-a84a-a43e695bf000'
+    assert response.body[0]['id'] == '319df05f-c5d9-4389-a84a-a43e695bf000'
     assert response.body[0]['title'] == 'Bright Star'
 
 
@@ -86,8 +80,10 @@ async def test_person_with_single_films(make_get_request, set_person_test_data, 
 async def test_person_without_films(make_get_request, set_person_test_data):
     test_data_person = TEST_DATA[9]
     lookup_person_id = test_data_person['id']
-    person_film_endpoint = f'/person/{lookup_person_id}/film'
+    person_film_endpoint = f'/api/v1/person/{lookup_person_id}/films'
+
     response = await make_get_request(person_film_endpoint)
 
-    assert response.status == HTTPStatus.NOT_FOUND
+    assert response.status == HTTPStatus.OK
+    assert len(response.body) == 0
 

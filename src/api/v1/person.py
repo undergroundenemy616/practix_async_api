@@ -1,3 +1,4 @@
+import uuid
 from http import HTTPStatus
 
 from elasticsearch import NotFoundError
@@ -41,7 +42,7 @@ async def person_list(query: str = Query(...),
             response_description="Полное имя, должность и id кинопроизведений, в которых участвовал",
             tags=['Детализация по персоне']
             )
-async def person_details(person_id: str,
+async def person_details(person_id: uuid.UUID,
                          person_service: SingleObjectService = Depends(get_retrieve_person_service)) -> PersonResponseModel:
     try:
         person = await person_service.get_by_id(person_id)
@@ -57,7 +58,7 @@ async def person_details(person_id: str,
             response_description="Название и рейтинг кинопроизведения",
             tags=['Кинопроизведения по персоне'],
             deprecated=True)
-async def person_films_list(person_id: str,
+async def person_films_list(person_id: uuid.UUID,
                             page_size: int = Query(20),
                             page_number: int = Query(1),
                             person_service: PersonFilmsListService = Depends(get_person_films_service)) -> list[PersonFilmResponseModel]:

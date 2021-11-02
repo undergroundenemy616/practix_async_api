@@ -33,7 +33,9 @@ async def test_list_film_with_size(make_get_request, set_films_test_data):
 
 async def test_get_film(make_get_request, set_films_test_data):
     test_data_film = TEST_DATA[1]
+
     response = await make_get_request(f"/api/v1/film/{test_data_film['id']}")
+
     assert response.status == HTTPStatus.OK
     assert response.body['id'] == test_data_film['id']
     assert response.body['rating'] == test_data_film['rating']
@@ -48,21 +50,15 @@ async def test_get_film_unknown_id(make_get_request):
     assert 'detail' in response_not_found.body
 
 
-@pytest.mark.asyncio
-async def test_get_film_invalid_id(make_get_request):
-    response_not_found = await make_get_request('/api/v1/film/10000')
-
-    assert response_not_found.status == HTTPStatus.NOT_FOUND
-    assert 'detail' in response_not_found.body
-
-
 async def test_film_cache(make_get_request, set_films_test_data, redis_client):
     test_data_film = TEST_DATA[1]
+
     response = await make_get_request(f"/api/v1/film/{test_data_film['id']}")
 
     assert response.status == HTTPStatus.OK
 
     data = await redis_client.get(test_data_film['id'])
     cached_data = json.loads(data)
+
     assert test_data_film['type'] == cached_data['type']
     assert test_data_film['title'] == cached_data['title']

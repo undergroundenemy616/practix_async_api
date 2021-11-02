@@ -3,7 +3,7 @@ from http import HTTPStatus
 import pytest
 
 from testdata.filmwork import INDEX_FILM_NAME, TEST_DATA, INDEX_FILM_BODY
-from utils.utils import get_redis_key_hash
+from utils.utils import get_expected_hash
 
 pytestmark = pytest.mark.asyncio
 
@@ -35,7 +35,7 @@ async def test_search_films(make_get_request, set_films_test_data):
     def check_structure(one_object_structure: dict):
         return set(one_object_structure.keys()) - {'id', 'title', 'rating'} == set()
 
-    assert all(check_structure(object_) for object_ in response.body)
+    assert all(check_structure(obj) for obj in response.body)
 
 
 async def test_search_films_with_size(make_get_request, set_films_test_data):
@@ -50,6 +50,7 @@ async def test_search_films_cache(make_get_request, set_films_test_data, redis_c
 
     assert response.status == HTTPStatus.OK
     assert len(response.body) == 2
+
     elasticsearch_query = {'query': {
         'multi_match': {
             'query': 'star',
@@ -57,12 +58,13 @@ async def test_search_films_cache(make_get_request, set_films_test_data, redis_c
         }
     }
     }
-    key_for_redis = get_redis_key_hash('filmwork', elasticsearch_query, 2, 1)
+    key_for_redis = get_expected_hash('filmwork', elasticsearch_query, 2, 1)
 
     cached_data = await redis_client.get(key_for_redis)
     cached_data = json.loads(cached_data)
+
     assert len(cached_data) == 2
-    assert set(film['title'] for film in response.body) - {'Dark Star', 'Rock Star'} == set()
+    assert set(film['title'] for film in response.body) - set(json.loads(film)['title'] for film in cached_data) == set()
 
 
 async def test_search_films_not_found(make_get_request, set_films_test_data):

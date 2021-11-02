@@ -1,4 +1,5 @@
 import logging
+import uuid
 from http import HTTPStatus
 from typing import Optional
 
@@ -68,7 +69,7 @@ async def film_search(query: str = Query(...),
             response_description="Название, рейтинг, описание, жанры, актеры, сценаристы и режиссеры кинопроизведения",
             tags=['Детализация кинопроизведения']
             )
-async def film_details(film_id: str, film_service: SingleObjectService = Depends(get_retrieve_film_service)) -> FilmResponseModel:
+async def film_details(film_id: uuid.UUID, film_service: SingleObjectService = Depends(get_retrieve_film_service)) -> FilmResponseModel:
     try:
         film = await film_service.get_by_id(film_id)
     except NotFoundError:

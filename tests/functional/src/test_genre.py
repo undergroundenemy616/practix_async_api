@@ -33,7 +33,9 @@ async def test_list_genre_with_size(make_get_request, set_genres_test_data):
 
 async def test_retrieve_genre(make_get_request, set_genres_test_data):
     test_data_genre = TEST_DATA[1]
+
     response = await make_get_request(f"/api/v1/genre/{test_data_genre['id']}")
+
     assert response.status == HTTPStatus.OK
     assert response.body['id'] == test_data_genre['id']
     assert response.body['name'] == test_data_genre['name']
@@ -42,11 +44,13 @@ async def test_retrieve_genre(make_get_request, set_genres_test_data):
 
 async def test_genre_cache(make_get_request, set_genres_test_data, redis_client):
     test_data_genre = TEST_DATA[1]
+
     response = await make_get_request(f"/api/v1/genre/{test_data_genre['id']}")
 
     assert response.status == HTTPStatus.OK
 
     cached_data = await redis_client.get(test_data_genre['id'])
     cached_data = json.loads(cached_data)
+
     assert test_data_genre['name'] == cached_data['name']
     assert test_data_genre['description'] == cached_data['description']
