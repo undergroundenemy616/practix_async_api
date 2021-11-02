@@ -27,8 +27,8 @@ class PersonFilmsListService(BaseListService):
                           page_size: int = 100,
                           page_number: int = 0,
                           **kwargs) -> list:
-        doc = await self.db_adapter.get('person', kwargs.pop('person_id'))
-        kwargs['film_ids'] = doc['_source']['film_ids']
+        doc = await self.db_adapter.get_object_from_db('person', Person, kwargs.pop('person_id'))
+        kwargs['film_ids'] = doc.film_ids
         return await super().get_objects(page_size, page_number, **kwargs)
 
 
