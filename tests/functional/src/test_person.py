@@ -52,6 +52,7 @@ async def test_get_person_unknown_id(make_get_request):
 async def test_person_cache(make_get_request, set_person_test_data, redis_client):
     test_data_person = TEST_DATA[1]
     lookup_person_id = test_data_person['id']
+
     response = await make_get_request(f'/api/v1/person/{lookup_person_id}')
 
     assert response.status == HTTPStatus.OK
@@ -86,4 +87,3 @@ async def test_person_without_films(make_get_request, set_person_test_data):
 
     assert response.status == HTTPStatus.OK
     assert len(response.body) == 0
-
