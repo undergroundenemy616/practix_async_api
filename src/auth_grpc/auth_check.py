@@ -12,7 +12,7 @@ from auth_grpc.auth_pb2_grpc import AuthStub
 
 
 auth_channel = grpc.insecure_channel(
-    f"{config.AUTH_GRPC_HOST}:50051"
+    f"{config.AUTH_GRPC_HOST}:{config.AUTH_GRPC_PORT}"
 )
 auth_client = AuthStub(auth_channel)
 
@@ -26,7 +26,7 @@ def check_permission(roles: list):
                 raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail='Authorization token needed')
             token = token.replace('Bearer ', '')
             auth_request = CheckRoleRequest(
-                access_token=token, roles=' '.join(roles)
+                access_token=token, roles=roles
             )
             auth_response = auth_client.CheckRole(
                 auth_request

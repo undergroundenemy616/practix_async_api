@@ -23,3 +23,4 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Auth host
 AUTH_GRPC_HOST = os.getenv('AUTH_GRPC_HOST', '127.0.0.1')
+AUTH_GRPC_PORT = os.getenv('AUTH_GRPC_PORT', '50051')
