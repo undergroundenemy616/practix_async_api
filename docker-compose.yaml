@@ -5,7 +5,7 @@ services:
     environment:
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-    restart: always
+#    restart: always
     volumes:
       - elastic_movies_data:/var/lib/elasticsearch/data
     networks:
@@ -15,7 +15,7 @@ services:
     image: redis:6.2.6-alpine
     volumes:
       - redis_data:/var/lib/redis/data
-    restart: always
+#    restart: always
     networks:
       - movies_network
 
@@ -30,7 +30,7 @@ services:
     depends_on:
       - elasticsearch
       - movies-redis
-    restart: always
+#    restart: always
     networks:
       - movies_network
 
@@ -41,11 +41,11 @@ services:
       - movies-redis
       - elasticsearch
     ports:
-      - "80:80"
+      - "8111:81"
     volumes:
       - ./etc/nginx/configs:/etc/nginx/conf.d:ro
       - ./etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    restart: always
+#    restart: always
     networks:
       - movies_network
 

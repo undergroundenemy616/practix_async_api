@@ -9,7 +9,7 @@ from fastapi import Request, HTTPException
 
 from auth_grpc.auth_pb2 import CheckRoleRequest
 from auth_grpc.auth_pb2_grpc import AuthStub
-
+from tracer import tracer
 
 auth_channel = grpc.insecure_channel(
     f"{config.AUTH_GRPC_HOST}:{config.AUTH_GRPC_PORT}"
@@ -28,9 +28,15 @@ def check_permission(roles: list):
             auth_request = CheckRoleRequest(
                 access_token=token, roles=roles
             )
-            auth_response = auth_client.CheckRole(
-                auth_request
-            )
+            with tracer.start_span('check-role') as span:
+                auth_response = auth_client.CheckRole(
+                    auth_request
+                )
+                request_id = request.headers.get('X-Request-Id')
+                span.set_tag('http.request_id', request_id)
+                span.set_tag('response_from_auth', auth_response)
+                span.set_tag('requested_API_endpoint', request.url.path)
+
             if auth_response.result:
                 return await func(*args, request, **kwargs)
 
