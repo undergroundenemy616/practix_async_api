@@ -33,7 +33,7 @@ async def shutdown():
 
 
 @app.middleware("http")
-async def add_process_time_header(request: Request, call_next):
+async def add_tracing(request: Request, call_next):
     request_id = request.headers.get('X-Request-Id')
     if not request_id:
         raise RuntimeError('request id is required')
