@@ -41,7 +41,7 @@ services:
       - movies-redis
       - elasticsearch
     ports:
-      - "8111:81"
+      - "80:80"
     volumes:
       - ./etc/nginx/configs:/etc/nginx/conf.d:ro
       - ./etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
