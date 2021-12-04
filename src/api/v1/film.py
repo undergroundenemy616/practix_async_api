@@ -27,7 +27,7 @@ logging.basicConfig(level=logging.INFO)
             response_description="Название и рейтинг фильма",
             tags=['Список кинопроизведений']
             )
-@check_permission(roles=["BaseUser"])
+@check_permission(roles=["Subscriber"])
 async def film_list(
         request: Request,
         sort: str = Query('-rating'),
