@@ -1,6 +1,6 @@
 import asyncio
-import aioredis
 
+import aioredis
 from settings import TestSettings
 
 config = TestSettings()

@@ -2,8 +2,7 @@ import json
 from http import HTTPStatus
 
 import pytest
-
-from testdata.genre import INDEX_GENRE_NAME, TEST_DATA, INDEX_GENRE_BODY
+from testdata.genre import INDEX_GENRE_BODY, INDEX_GENRE_NAME, TEST_DATA
 
 pytestmark = pytest.mark.asyncio
 

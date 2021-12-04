@@ -3,8 +3,8 @@ from typing import Optional
 
 from fastapi import Depends
 
-from db.elastic import get_elastic, ElasticAdapter
-from db.redis import get_redis, RedisAdapter
+from db.elastic import ElasticAdapter, get_elastic
+from db.redis import RedisAdapter, get_redis
 from models.film import Film
 from services.base_services.list_object_service import BaseListService
 from services.base_services.single_object_service import SingleObjectService
@@ -13,18 +13,18 @@ from services.base_services.single_object_service import SingleObjectService
 class FilmsListService(BaseListService):
 
     @staticmethod
-    def get_elastic_query(genre: Optional[str], sort: Optional[str]) -> dict:
+    def get_elastic_query(genre: Optional[str], sort: Optional[str], degrading: bool = False) -> dict:
         field = sort.lstrip('-')
         query = {
             'sort':
                 {
                     field: {'order': 'desc' if sort.startswith('-') else 'asc'}
-                }
+                },
+            'query':
+                {'bool': {}}
         }
         if genre:
-            query['query'] = {'bool': {
-                'must':
-                    {
+            query['query']['bool']['must'] = {
                         'nested': {
                             'path': 'genres',
                             'query': {
@@ -35,8 +35,14 @@ class FilmsListService(BaseListService):
                             }
                         }
                     }
-            }
-            }
+
+        if degrading:
+            query['query']['bool']['filter'] = {
+                        "range": {
+                            "rating": {"lt": 7}
+                        },
+                    }
+
         return query
 
 
@@ -50,7 +56,7 @@ class FilmSearchService(BaseListService):
                 'fields': ['title', 'description']
             }
         }
-    }
+        }
         return query
 
 

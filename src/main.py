@@ -1,9 +1,8 @@
 import aioredis
 import uvicorn
 from elasticsearch import AsyncElasticsearch
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import ORJSONResponse
-from fastapi import Request, HTTPException
 
 from api.v1 import film, genre, person
 from core import config

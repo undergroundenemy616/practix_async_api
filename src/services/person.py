@@ -3,8 +3,8 @@ from functools import lru_cache
 
 from fastapi import Depends
 
-from db.elastic import get_elastic, ElasticAdapter
-from db.redis import get_redis, RedisAdapter
+from db.elastic import ElasticAdapter, get_elastic
+from db.redis import RedisAdapter, get_redis
 from models.film import Film
 from models.person import Person
 from services.base_services.list_object_service import BaseListService

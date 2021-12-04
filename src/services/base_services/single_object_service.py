@@ -1,8 +1,8 @@
 import uuid
 from typing import Any
 
-from db.redis import AbstractCacheAdapter
 from db.elastic import AbstractDBAdapter
+from db.redis import AbstractCacheAdapter
 
 
 class SingleObjectService:

@@ -3,9 +3,8 @@ import uuid
 from http import HTTPStatus
 
 from elasticsearch import NotFoundError
-from fastapi import Request, APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
-from auth_grpc.auth_check import check_permission
 from models.genre import GenreResponseModel
 from services.base_services.single_object_service import SingleObjectService
 from services.genre import (GenresListService, get_genre_list_service,
@@ -40,7 +39,6 @@ async def genre_details(genre_id: uuid.UUID,
             response_description="Название жанров",
             tags=['Список жанров'],
             response_model_exclude={'description'})
-@check_permission(roles=["BaseUser"])
 async def genres_list(
         request: Request,
         amount: int = Query(100),

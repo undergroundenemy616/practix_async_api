@@ -4,9 +4,10 @@ from http import HTTPStatus
 from typing import Optional
 
 from elasticsearch import NotFoundError
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import ValidationError
 
+from auth_grpc.auth_check import check_permission
 from models.film import FilmListResponseModel, FilmResponseModel
 from services.base_services.single_object_service import SingleObjectService
 from services.film import (FilmSearchService, FilmsListService,
@@ -26,13 +27,18 @@ logging.basicConfig(level=logging.INFO)
             response_description="Название и рейтинг фильма",
             tags=['Список кинопроизведений']
             )
-async def film_list(sort: str = Query('-rating'),
-                    page_size: int = Query(20),
-                    page_number: int = Query(1),
-                    genre: Optional[str] = None,
-                    film_service: FilmsListService = Depends(get_list_film_service)):
+@check_permission(roles=["BaseUser"])
+async def film_list(
+        request: Request,
+        sort: str = Query('-rating'),
+        page_size: int = Query(20),
+        page_number: int = Query(1),
+        genre: Optional[str] = None,
+        degrading: bool = False,
+        film_service: FilmsListService = Depends(get_list_film_service)):
     try:
-        films_response = await film_service.get_objects(page_size, page_number, genre=genre, sort=sort)
+        films_response = await film_service.get_objects(page_size, page_number, genre=genre,
+                                                        sort=sort, degrading=degrading)
     except ValidationError:
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="No such page")
     except NotFoundError:
@@ -69,7 +75,8 @@ async def film_search(query: str = Query(...),
             response_description="Название, рейтинг, описание, жанры, актеры, сценаристы и режиссеры кинопроизведения",
             tags=['Детализация кинопроизведения']
             )
-async def film_details(film_id: uuid.UUID, film_service: SingleObjectService = Depends(get_retrieve_film_service)) -> FilmResponseModel:
+async def film_details(film_id: uuid.UUID,
+                       film_service: SingleObjectService = Depends(get_retrieve_film_service)) -> FilmResponseModel:
     try:
         film = await film_service.get_by_id(film_id)
     except NotFoundError:

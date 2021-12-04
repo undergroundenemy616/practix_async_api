@@ -2,8 +2,8 @@ import json
 from abc import abstractmethod
 from typing import Any
 
-from db.redis import AbstractCacheAdapter
 from db.elastic import AbstractDBAdapter
+from db.redis import AbstractCacheAdapter
 from utils import get_redis_key_hash
 
 

@@ -1,11 +1,9 @@
 import json
-from typing import Optional, Any
 from abc import abstractmethod
+from typing import Any, Optional
 
 import backoff as backoff
-from aioredis import ConnectionClosedError
-
-from aioredis import Redis
+from aioredis import ConnectionClosedError, Redis
 
 from utils import CACHE_EXPIRE_IN_SECONDS, get_redis_key_hash
 

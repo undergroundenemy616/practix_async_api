@@ -2,13 +2,11 @@ from functools import lru_cache
 
 from fastapi import Depends
 
-from db.elastic import get_elastic
-from db.redis import get_redis
+from db.elastic import ElasticAdapter, get_elastic
+from db.redis import RedisAdapter, get_redis
 from models.genre import Genre
 from services.base_services.list_object_service import BaseListService
 from services.base_services.single_object_service import SingleObjectService
-from db.redis import RedisAdapter
-from db.elastic import ElasticAdapter
 
 
 class GenresListService(BaseListService):

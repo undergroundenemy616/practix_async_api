@@ -2,8 +2,8 @@ import json
 from http import HTTPStatus
 
 import pytest
+from testdata.person import INDEX_PERSON_BODY, INDEX_PERSON_NAME, TEST_DATA
 
-from testdata.person import INDEX_PERSON_NAME, TEST_DATA, INDEX_PERSON_BODY
 from utils.utils import get_expected_hash
 
 pytestmark = pytest.mark.asyncio

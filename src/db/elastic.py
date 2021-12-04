@@ -1,8 +1,8 @@
-from typing import Optional, Any
+from abc import abstractmethod
+from typing import Any, Optional
 
 import backoff as backoff
 from elasticsearch import AsyncElasticsearch, ConnectionError
-from abc import abstractmethod
 
 es: Optional[AsyncElasticsearch] = None
 

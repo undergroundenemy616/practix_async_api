@@ -1,7 +1,6 @@
 import asyncio
 
 from elasticsearch import AsyncElasticsearch
-
 from settings import TestSettings
 
 config = TestSettings()

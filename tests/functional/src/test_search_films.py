@@ -1,8 +1,9 @@
 import json
 from http import HTTPStatus
-import pytest
 
-from testdata.filmwork import INDEX_FILM_NAME, TEST_DATA, INDEX_FILM_BODY
+import pytest
+from testdata.filmwork import INDEX_FILM_BODY, INDEX_FILM_NAME, TEST_DATA
+
 from utils.utils import get_expected_hash
 
 pytestmark = pytest.mark.asyncio

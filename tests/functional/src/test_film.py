@@ -2,8 +2,7 @@ import json
 from http import HTTPStatus
 
 import pytest
-
-from testdata.filmwork import TEST_DATA, INDEX_FILM_BODY, INDEX_FILM_NAME
+from testdata.filmwork import INDEX_FILM_BODY, INDEX_FILM_NAME, TEST_DATA
 
 pytestmark = pytest.mark.asyncio
 

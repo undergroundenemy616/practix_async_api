@@ -7,7 +7,6 @@ import aioredis
 import pytest
 from elasticsearch import AsyncElasticsearch
 from multidict import CIMultiDictProxy
-
 from settings import TestSettings
 
 config = TestSettings()
