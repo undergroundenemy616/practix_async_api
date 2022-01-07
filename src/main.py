@@ -1,8 +1,10 @@
 import aioredis
 import uvicorn
+import sentry_sdk
 from elasticsearch import AsyncElasticsearch
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import ORJSONResponse
+from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 
 from api.v1 import film, genre, person
 from core import config
@@ -17,6 +19,8 @@ app = FastAPI(
     version="1.0.0",
     default_response_class=ORJSONResponse,
 )
+
+sentry_sdk.init(dsn=config.SENTRY_DSN)
 
 
 @app.on_event('startup')
@@ -49,6 +53,8 @@ async def add_tracing(request: Request, call_next):
 app.include_router(film.router, prefix='/api/v1/film', tags=['film'])
 app.include_router(genre.router, prefix='/api/v1/genre', tags=['genre'])
 app.include_router(person.router, prefix='/api/v1/person', tags=['person'])
+
+app.add_middleware(SentryAsgiMiddleware)
 
 if __name__ == '__main__':
     uvicorn.run(
