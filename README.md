@@ -13,7 +13,6 @@ docker-compose up
 
 Дополненные проекты с сервисами ETL располагаются в следующих репозиториях: 
 https://github.com/undergroundenemy616/ETL/
-https://github.com/KonstantinChernov/ETL/
 
 Для запуска тестов необходимо поднять докер с тестовым стендом:
 ```
